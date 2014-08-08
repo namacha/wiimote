@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from new import classobj
-
-
-WiimoteNotFound = classobj('WiimoteNotFound', (Exception, ), {})
-WiimoteDisconnected = classobj('WiimoteDisconnected', (Exception, ), {})
+WiimoteNotFound = type('WiimoteNotFound', (Exception, ), {})
+WiimoteDisconnected = type('WiimoteDisconnected', (Exception, ), {})
