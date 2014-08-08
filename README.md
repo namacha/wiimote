@@ -32,10 +32,14 @@ def down():
 
 if __name__ == '__main__':
     import sys
+    import time
     try:
         w.connect()
     except wiimote.WiimoteNotFound:
         sys.stderr.write('Wiimote not found\n')
         sys.stderr.flush()
         sys.exit(1) 
+
+    while w.connected:
+        time.sleep(1)
 ```
