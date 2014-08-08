@@ -71,7 +71,7 @@ class Buttons(object):
         self.pressed = 0
         self.previous = 0
         self.pressed_buttons = {2 ** k[1]: False for k in
-                                (_BUTTON_UPPER_BYTES + _BUTTON_LOWER_BYTES)}
+                                (BUTTON_UPPER_BYTES + BUTTON_LOWER_BYTES)}
         self.prev_buttons = self.pressed_buttons
 
     def parse_line(self, data):
@@ -141,9 +141,11 @@ class Wiimote(object):
         self._pressed = self.buttons.pressed
         self.onpressed = self.processor.onpushed
         self.onreleased = self.processor.onreleased
-        self.ispressed = lambda button: self.buttons.pressed_buttons.get(button)
         self.t = threading.Thread(target=self.worker)
         self.t.setDaemon(True)
+
+    def ispressed(button):
+        return self.buttons.pressed_buttons.get(button)
 
     @property
     def pressed_buttons(self):
