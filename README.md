@@ -30,9 +30,11 @@ def a_and_b():
 def down():
     print 'down released'
 
+
 if __name__ == '__main__':
     import sys
     import time
+
     try:
         w.connect()
     except wiimote.WiimoteNotFound:
