@@ -12,7 +12,7 @@ Requirements
 How to Use
 =================
 
-```
+```python
 import wiimote
 from wiimote.buttons import *
 
@@ -45,3 +45,4 @@ if __name__ == '__main__':
     while w.connected:
         time.sleep(1)
 ```
+
