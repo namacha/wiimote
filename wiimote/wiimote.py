@@ -6,7 +6,12 @@ import functools
 
 import bluetooth
 
-from .buttons import *
+from .buttons import (
+    _BUTTON_LOWER_BYTES,
+    _BUTTON_UPPER_BYTES,
+    _BUTTON_UNUSED1,
+    _BUTTON_UNUSED2,
+)
 from .exceptions import (
     WiimoteNotFound,
     WiimoteDisconnected,
@@ -71,7 +76,7 @@ class Buttons(object):
         self.pressed = 0
         self.previous = 0
         self.pressed_buttons = {2 ** k[1]: False for k in
-                                (BUTTON_UPPER_BYTES + BUTTON_LOWER_BYTES)}
+                                (_BUTTON_UPPER_BYTES + _BUTTON_LOWER_BYTES)}
         self.prev_buttons = self.pressed_buttons
 
     def parse_line(self, data):
