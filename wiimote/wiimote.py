@@ -149,7 +149,7 @@ class Wiimote(object):
         self.t = threading.Thread(target=self.worker)
         self.t.setDaemon(True)
 
-    def ispressed(button):
+    def ispressed(self, button):
         return self.buttons.pressed_buttons.get(button)
 
     @property
