@@ -18,6 +18,7 @@ from .exceptions import (
 )
 from .command_data import (
     SET_REPORT,
+    DATA_REPORT,
     CONTINUOUS_REPORTING,
     REPORT_COREBUTTONS_ACC,
     COMMAND_RUMBLE,
@@ -26,7 +27,7 @@ from .command_data import (
 )
 
 
-COMMAND_REPORTING = SET_REPORT + CONTINUOUS_REPORTING + REPORT_COREBUTTONS_ACC
+COMMAND_REPORTING = SET_REPORT + DATA_REPORT + CONTINUOUS_REPORTING + REPORT_COREBUTTONS_ACC
 COMMAND_STATUS = SET_REPORT + COMMAND_REPORT_STATUS
 COMMAND_RUMBLE = SET_REPORT + COMMAND_RUMBLE
 COMMAND_LED = SET_REPORT + COMMAND_SET_LED
@@ -43,7 +44,7 @@ class Processor(object):
         self.pushed = {}
         self.disconnected = {}
 
-    def onpushed(self, buttons):
+    def onpressed(self, buttons):
         def receive_processor(processor):
             @functools.wraps(processor)
             def wrapper(*args, **kwargs):
@@ -137,20 +138,22 @@ class Wiimote(object):
         self.ADDR = ADDR
         self.batt = -1
         self.ledstate = 0
-        self.connected = False
-        self._disconnect = False
+        self.__connected = False
         self.last_received = ''
         self.initial_data = []
         self.processor = Processor()
         self.buttons = Buttons(self.processor)
         self._pressed = self.buttons.pressed
-        self.onpressed = self.processor.onpushed
+        self.onpressed = self.processor.onpressed
         self.onreleased = self.processor.onreleased
         self.t = threading.Thread(target=self.worker)
         self.t.setDaemon(True)
 
     def ispressed(self, button):
         return self.buttons.pressed_buttons.get(button)
+
+    def connected(self):
+        return self.__connected
 
     @property
     def pressed_buttons(self):
@@ -174,13 +177,13 @@ class Wiimote(object):
             self.send_sock.connect((self.ADDR, 0x11))
         except bluetooth.btcommon.BluetoothError:
             raise WiimoteNotFound
-        self.connected = True
+        self.__connected = True
         self.initialize()
         self.t.start()
         map(lambda f: f(), self.processor.connected)
 
     def initialize(self):
-        if self.connected:
+        if self.connected():
             self.send(COMMAND_STATUS)
             self.send(COMMAND_REPORTING)
             self.initial_data = [self.receive() for i in range(10)]
@@ -188,6 +191,13 @@ class Wiimote(object):
                 intype = data.encode('hex')[2:4]
                 if intype == str('20'):
                     self.set_batt_level(data)
+
+    def disconnect(self):
+        if self.connected():
+            self.__connected = False
+            self.recv_sock.close()
+            self.send_sock.close()
+            self.t = threading.Thread(target=self.worker)
 
     def discover(self):
         addr = None
@@ -228,6 +238,6 @@ class Wiimote(object):
         return False
 
     def worker(self):
-        while not self._disconnect:
+        while self.connected():
             self.last_received = self.receive()
             self.buttons.handle(self.last_received)
