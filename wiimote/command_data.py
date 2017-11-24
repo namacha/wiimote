@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+DATA_REPORT = '12'
 SET_REPORT = '52'
 CONTINUOUS_REPORTING = '04'
 INTERMITTENT_REPORTING = '00'
